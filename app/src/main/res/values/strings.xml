@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">StoreManager</string>
+    <string name="employee_name">Employee Name</string>
+    <string name="salary">Salary</string>
+    <string name="age">Age</string>
+    <string name="no_data_found">no data found</string>
+</resources>
