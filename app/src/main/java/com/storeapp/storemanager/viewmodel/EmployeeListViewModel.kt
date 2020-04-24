@@ -47,6 +47,7 @@ class EmployeeListViewModel(
     fun getEmployee(id: String) {
         employeeDataRepository.getEmployee(id).observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
+//            .retry(3)
             .subscribe({
                 val status = it.status
                 if (status.equals("success")) {

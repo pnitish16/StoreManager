@@ -69,5 +69,12 @@ class EmployeeListActivity : AppCompatActivity(),
 
 
     override fun onListFragmentInteraction(item: EmployeeItem) {
+        val employeeDetailIntent = Intent(this,EmployeeDetailActivity::class.java)
+        val bundle = Bundle()
+        bundle.putString("employee_id", item.id)
+        bundle.putString("employee_name", item.employeeName)
+        employeeDetailIntent.putExtra("employee_data", bundle)
+        startActivity(employeeDetailIntent)
+
     }
 }
