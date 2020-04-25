@@ -39,6 +39,7 @@ class EmployeeListAdapter(
         }
 
         holder.mView.setOnClickListener { (context as EmployeeListActivity).onListFragmentInteraction(item1) }
+        holder.ivDeleteEmployee.setOnClickListener { (context as EmployeeListActivity).onDeleteEmployee(item1.id?:0) }
     }
 
     override fun getItemCount(): Int = mValues.size
@@ -46,9 +47,12 @@ class EmployeeListAdapter(
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
         val ivEmployeeProfile: ImageView = mView.ivEmployeeProfile
         val tvEmployeeName: TextView = mView.tvEmployeeName
+        val ivDeleteEmployee: ImageView = mView.ivDeleteEmployee
+
     }
 
     interface OnListFragmentInteractionListener {
         fun onListFragmentInteraction(item: EmployeeItem)
+        fun onDeleteEmployee(employeeId : Int)
     }
 }

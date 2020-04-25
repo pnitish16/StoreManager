@@ -17,8 +17,7 @@ import kotlinx.android.synthetic.main.activity_employee_detail.*
 class EmployeeDetailActivity : AppCompatActivity() {
 
     private lateinit var employeeListViewModel: EmployeeListViewModel
-    private var employeeId: String? = null
-    private var employeeName: String? = "Unknown"
+    private var employeeItem: EmployeeItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,21 +29,20 @@ class EmployeeDetailActivity : AppCompatActivity() {
         if (intent.extras != null) {
             val bundle = intent.getBundleExtra("employee_data")
             if (bundle != null) {
-                employeeId = bundle.getString("employee_id")
-                employeeName = bundle.getString("employee_name")
+                employeeItem = bundle.getParcelable("employee_item")
             }
         }
 
-        title = employeeName
+        title = employeeItem?.employeeName
         val application = requireNotNull(this).application
         val viewModelFactory = EmployeeListViewModelFactory(application)
         employeeListViewModel =
             ViewModelProvider(this, viewModelFactory).get(EmployeeListViewModel::class.java)
 
-        val empId = employeeId.apply { } ?: "id"
-        if (empId != "id") {
+        val employeeId = employeeItem?.id ?: 0
+        if (employeeId != 0) {
             pbEmployeeDetail.visibility = View.VISIBLE
-            employeeListViewModel.getEmployee(empId)
+            employeeListViewModel.getEmployee(employeeId)
         }
         subscribeViewModel()
     }
@@ -55,13 +53,17 @@ class EmployeeDetailActivity : AppCompatActivity() {
                 pbEmployeeDetail.visibility = View.GONE
                 tvEmployeeDetailNameValue.text = it?.employeeName
                 tvEmployeeDetailSalaryValue.text = it?.employeeSalary
-                tvEmployeeDetailAgeValue.text = it?.employeeAge
+                tvEmployeeDetailAgeValue.text = "${it?.employeeAge}"
             })
 
         employeeListViewModel.mutableResponseError.observe(this,
             Observer<String> {
                 pbEmployeeDetail.visibility = View.GONE
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+
+                tvEmployeeDetailNameValue.text = employeeItem?.employeeName?:"unknown"
+                tvEmployeeDetailSalaryValue.text = employeeItem?.employeeSalary?:"NA"
+                tvEmployeeDetailAgeValue.text = "${employeeItem?.employeeAge?:"unknown"}"
             })
     }
 }

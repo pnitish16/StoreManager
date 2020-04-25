@@ -13,10 +13,10 @@ interface EmployeeApi {
     fun getEmployeeList(): Observable<BaseEntity<List<EmployeeItem?>>>
 
     @GET("employee/{id}")
-    fun getEmployee(@Path("id") id: String): Observable<BaseEntity<EmployeeItem?>>
+    fun getEmployee(@Path("id") id: Int): Observable<BaseEntity<EmployeeItem?>>
 
-    @DELETE
-    fun deleteEmployee(@Path("id") id: String): Observable<BaseEntity<EmployeeItem?>>
+    @DELETE("delete/{id}")
+    fun deleteEmployee(@Path("id") id: Int): Observable<BaseEntity<EmployeeItem?>>
 
     companion object {
         const val SERVICE_ENDPOINT = "http://dummy.restapiexample.com/api/v1/"

@@ -4,4 +4,6 @@
     <string name="salary">Salary</string>
     <string name="age">Age</string>
     <string name="no_data_found">no data found</string>
+    <string name="employee_name_a_z">Employee Name(A-Z)</string>
+    <string name="age_0_9">Age(0-9)</string>
 </resources>

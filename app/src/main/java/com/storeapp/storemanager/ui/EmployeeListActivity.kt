@@ -1,10 +1,12 @@
 package com.storeapp.storemanager.ui
 
+import android.content.DialogInterface
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,8 +17,9 @@ import com.storeapp.storemanager.viewmodel.EmployeeListViewModel
 import com.storeapp.storemanager.viewmodel.EmployeeListViewModelFactory
 import kotlinx.android.synthetic.main.activity_employee_list.*
 
+
 class EmployeeListActivity : AppCompatActivity(),
-    EmployeeListAdapter.OnListFragmentInteractionListener {
+    EmployeeListAdapter.OnListFragmentInteractionListener, View.OnClickListener {
 
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var employeeListAdapter: EmployeeListAdapter
@@ -30,6 +33,10 @@ class EmployeeListActivity : AppCompatActivity(),
     }
 
     private fun initView() {
+
+        btnEmployeeNameSort.setOnClickListener(this)
+        btnEmployeeAgeSort.setOnClickListener(this)
+
         val application = requireNotNull(this).application
         val viewModelFactory = EmployeeListViewModelFactory(application)
         employeeListViewModel =
@@ -65,16 +72,57 @@ class EmployeeListActivity : AppCompatActivity(),
                 tvEmptyViewEmployeeList.visibility = View.VISIBLE
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
             })
+
+        employeeListViewModel.mutableEmployeeListName.observe(this, Observer<List<EmployeeItem?>> {
+            employeeList.clear()
+            employeeList.addAll(it)
+            employeeListAdapter.notifyDataSetChanged()
+        })
     }
 
-
+    //region recyclerview interactions
     override fun onListFragmentInteraction(item: EmployeeItem) {
-        val employeeDetailIntent = Intent(this,EmployeeDetailActivity::class.java)
+        val employeeDetailIntent = Intent(this, EmployeeDetailActivity::class.java)
         val bundle = Bundle()
-        bundle.putString("employee_id", item.id)
-        bundle.putString("employee_name", item.employeeName)
+        bundle.putParcelable("employee_item", item)
         employeeDetailIntent.putExtra("employee_data", bundle)
         startActivity(employeeDetailIntent)
-
     }
+
+    override fun onDeleteEmployee(employeeId: Int) {
+        if (employeeId != 0) {
+            val deleteDialog = deleteDialog(employeeId).apply { } ?: return
+            deleteDialog.show()
+        }
+    }
+    //endregion
+
+    override fun onClick(p0: View?) {
+        val view = p0.apply { } ?: return
+        when (view.id) {
+            R.id.btnEmployeeNameSort -> {
+                employeeListViewModel.sortListByName(employeeList)
+            }
+            R.id.btnEmployeeAgeSort -> {
+                employeeListViewModel.sortListByAge(employeeList)
+            }
+        }
+    }
+
+
+    //region show delete dialog
+    private fun deleteDialog(employeeId: Int): AlertDialog? {
+        return AlertDialog.Builder(this) // set message, title, and icon
+            .setTitle("Delete")
+            .setMessage("Are you sure you want to delete?")
+            .setIcon(android.R.drawable.ic_delete)
+            .setPositiveButton("delete",
+                DialogInterface.OnClickListener { dialog, _ ->
+                    employeeListViewModel.deleteEmployee(employeeId)
+                })
+            .setNegativeButton("cancel",
+                DialogInterface.OnClickListener { dialog, _ -> dialog.dismiss() })
+            .create()
+    }
+    //endregion
 }

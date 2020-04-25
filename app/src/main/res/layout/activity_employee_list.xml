@@ -6,14 +6,55 @@
     android:layout_height="match_parent"
     tools:context=".ui.EmployeeListActivity">
 
+    <TextView
+        android:id="@+id/tvSortBy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:padding="10dp"
+        android:text="Sort By"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnEmployeeNameSort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:padding="5dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button_selector"
+        android:text="@string/employee_name_a_z"
+        app:layout_constraintBottom_toBottomOf="@+id/tvSortBy"
+        app:layout_constraintStart_toEndOf="@+id/tvSortBy"
+        app:layout_constraintTop_toTopOf="@+id/tvSortBy" />
+
+    <Button
+        android:id="@+id/btnEmployeeAgeSort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/button_selector"
+        android:padding="10dp"
+        android:text="@string/age_0_9"
+        app:layout_constraintBottom_toBottomOf="@+id/tvSortBy"
+        app:layout_constraintStart_toEndOf="@+id/btnEmployeeNameSort"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvEmployeeList"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tvSortBy" />
 
     <TextView
         android:id="@+id/tvEmptyViewEmployeeList"

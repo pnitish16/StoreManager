@@ -9,6 +9,10 @@ import com.storeapp.storemanager.model.employee.EmployeeItem
 import com.storeapp.storemanager.network.EmployeeDataRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class EmployeeListViewModel(
     application: Application
@@ -18,6 +22,8 @@ class EmployeeListViewModel(
     var mutableEmployeeList = MutableLiveData<List<EmployeeItem?>>()
     var mutableResponseError = MutableLiveData<String>()
     var mutableEmployee = MutableLiveData<EmployeeItem?>()
+    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+    var mutableEmployeeListName = MutableLiveData<List<EmployeeItem?>>()
 
     //getting all employees
     @SuppressLint("CheckResult")
@@ -44,7 +50,7 @@ class EmployeeListViewModel(
 
     //getting single employe
     @SuppressLint("CheckResult")
-    fun getEmployee(id: String) {
+    fun getEmployee(id: Int) {
         employeeDataRepository.getEmployee(id).observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
 //            .retry(3)
@@ -68,7 +74,7 @@ class EmployeeListViewModel(
 
     //delete single employee
     @SuppressLint("CheckResult")
-    fun deleteEmployee(id: String) {
+    fun deleteEmployee(id: Int) {
         employeeDataRepository.deleteEmployee(id).observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
@@ -88,4 +94,35 @@ class EmployeeListViewModel(
                     }
                 })
     }
+
+
+    //region sorting list by name and age functions
+    fun sortListByName(list: MutableList<EmployeeItem?>) {
+        viewModelScope.launch {
+            mutableEmployeeListName.value = sortListName(list)
+        }
+    }
+
+    fun sortListByAge(list: MutableList<EmployeeItem?>) {
+        viewModelScope.launch {
+            mutableEmployeeListName.value = sortListAge(list)
+        }
+    }
+    //endregion
+
+    /**
+     * Sorting the list
+     */
+    suspend fun sortListName(employeeList: MutableList<EmployeeItem?>): List<EmployeeItem?> =
+        withContext(Dispatchers.Default) {
+            return@withContext employeeList
+                .sortedBy { it?.employeeName }
+        }
+
+
+    suspend fun sortListAge(employeeList: MutableList<EmployeeItem?>): List<EmployeeItem?> =
+        withContext(Dispatchers.Default) {
+            return@withContext employeeList
+                .sortedBy { it?.employeeAge }
+        }
 }

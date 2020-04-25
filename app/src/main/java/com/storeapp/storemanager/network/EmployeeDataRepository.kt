@@ -12,13 +12,13 @@ class EmployeeDataRepository {
         return service.getEmployeeList()
     }
 
-    fun getEmployee(id: String): Observable<BaseEntity<EmployeeItem?>> {
+    fun getEmployee(id: Int): Observable<BaseEntity<EmployeeItem?>> {
         val service =
             ServiceFactory.createRetrofitService(EmployeeApi::class.java, EmployeeApi.SERVICE_ENDPOINT)
         return service.getEmployee(id)
     }
 
-    fun deleteEmployee(id : String): Observable<BaseEntity<EmployeeItem?>> {
+    fun deleteEmployee(id : Int): Observable<BaseEntity<EmployeeItem?>> {
         val service =
             ServiceFactory.createRetrofitService(EmployeeApi::class.java, EmployeeApi.SERVICE_ENDPOINT)
         return service.deleteEmployee(id)
