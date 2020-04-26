@@ -6,22 +6,22 @@ import io.reactivex.Observable
 
 class EmployeeDataRepository {
 
+    private val employeeApi: EmployeeApi = ServiceFactory.createRetrofitService(
+        EmployeeApi::class.java,
+        EmployeeApi.SERVICE_ENDPOINT
+    )
+
+
     fun getEmployeeList(): Observable<BaseEntity<List<EmployeeItem?>>> {
-        val service =
-            ServiceFactory.createRetrofitService(EmployeeApi::class.java, EmployeeApi.SERVICE_ENDPOINT)
-        return service.getEmployeeList()
+        return employeeApi.getEmployeeList()
     }
 
     fun getEmployee(id: Int): Observable<BaseEntity<EmployeeItem?>> {
-        val service =
-            ServiceFactory.createRetrofitService(EmployeeApi::class.java, EmployeeApi.SERVICE_ENDPOINT)
-        return service.getEmployee(id)
+        return employeeApi.getEmployee(id)
     }
 
-    fun deleteEmployee(id : Int): Observable<BaseEntity<EmployeeItem?>> {
-        val service =
-            ServiceFactory.createRetrofitService(EmployeeApi::class.java, EmployeeApi.SERVICE_ENDPOINT)
-        return service.deleteEmployee(id)
+    fun deleteEmployee(id: Int): Observable<BaseEntity<EmployeeItem?>> {
+        return employeeApi.deleteEmployee(id)
     }
 
 }

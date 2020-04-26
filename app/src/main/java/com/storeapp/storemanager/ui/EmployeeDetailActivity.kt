@@ -35,7 +35,7 @@ class EmployeeDetailActivity : AppCompatActivity() {
 
         title = employeeItem?.employeeName
         val application = requireNotNull(this).application
-        val viewModelFactory = EmployeeListViewModelFactory(application)
+        val viewModelFactory = EmployeeListViewModelFactory()
         employeeListViewModel =
             ViewModelProvider(this, viewModelFactory).get(EmployeeListViewModel::class.java)
 

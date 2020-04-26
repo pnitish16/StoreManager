@@ -38,7 +38,7 @@ class EmployeeListActivity : AppCompatActivity(),
         btnEmployeeAgeSort.setOnClickListener(this)
 
         val application = requireNotNull(this).application
-        val viewModelFactory = EmployeeListViewModelFactory(application)
+        val viewModelFactory = EmployeeListViewModelFactory()
         employeeListViewModel =
             ViewModelProvider(this, viewModelFactory).get(EmployeeListViewModel::class.java)
         layoutManager =

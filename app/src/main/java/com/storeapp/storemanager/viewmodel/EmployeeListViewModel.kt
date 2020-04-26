@@ -5,18 +5,22 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.storeapp.storemanager.model.BaseEntity
 import com.storeapp.storemanager.model.employee.EmployeeItem
+import com.storeapp.storemanager.network.EmployeeApi
 import com.storeapp.storemanager.network.EmployeeDataRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 
-class EmployeeListViewModel(
-    application: Application
-) : AndroidViewModel(application) {
+class EmployeeListViewModel() : ViewModel() {
 
     private var employeeDataRepository: EmployeeDataRepository = EmployeeDataRepository()
     var mutableEmployeeList = MutableLiveData<List<EmployeeItem?>>()
@@ -24,6 +28,32 @@ class EmployeeListViewModel(
     var mutableEmployee = MutableLiveData<EmployeeItem?>()
     private val viewModelScope = CoroutineScope(Dispatchers.Main)
     var mutableEmployeeListName = MutableLiveData<List<EmployeeItem?>>()
+
+    private val compositeDisposable = CompositeDisposable()
+
+  /*  fun getEmployeeListNew(){
+        val disposable = employeeApi.getEmployeeList()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                val status = it.status
+                if (status.equals("success")) {
+                    if (it.data != null) {
+                        mutableEmployeeList.value = it.data!!
+                    }
+                } else if (status == "failed") {
+                    mutableResponseError.value = it.message!!
+                }
+            },
+                { error ->
+                    run {
+                        Log.d("error", error.message ?: "Error")
+                        mutableResponseError.value = error.message ?: "Error"
+                    }
+                })
+        compositeDisposable.add(disposable)
+    }*/
+
 
     //getting all employees
     @SuppressLint("CheckResult")
