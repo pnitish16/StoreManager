@@ -7,6 +7,7 @@ import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.Observer
 import com.google.common.base.Verify.verify
 import com.storeapp.storemanager.RxImmediateSchedulerRule
+import com.storeapp.storemanager.database.EmployeeDatabaseDao
 import com.storeapp.storemanager.model.BaseEntity
 import com.storeapp.storemanager.model.employee.EmployeeItem
 import com.storeapp.storemanager.network.EmployeeDataRepository
@@ -39,6 +40,9 @@ class EmployeeListViewModelTest {
 
     private lateinit var employeeDataRepository: EmployeeDataRepository
 
+    @Mock
+    private lateinit var employeeDatabaseDao: EmployeeDatabaseDao
+
     // Executes each task synchronously using Architecture Components.
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -55,7 +59,7 @@ class EmployeeListViewModelTest {
         MockitoAnnotations.initMocks(this)
         lifecycle = LifecycleRegistry(lifecycleOwner)
         employeeDataRepository = EmployeeDataRepository()
-        employeeListViewModel = EmployeeListViewModel()
+        employeeListViewModel = EmployeeListViewModel(employeeDatabaseDao)
         employeeListViewModel.mutableEmployeeList.observeForever(successObserver)
     }
 
