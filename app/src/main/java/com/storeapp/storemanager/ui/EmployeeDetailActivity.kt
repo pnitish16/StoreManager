@@ -7,8 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.storeapp.storemanager.NetworkConnectionUtils
 import com.storeapp.storemanager.R
 import com.storeapp.storemanager.adapter.EmployeeListAdapter
+import com.storeapp.storemanager.database.EmployeeDatabase
 import com.storeapp.storemanager.model.employee.EmployeeItem
 import com.storeapp.storemanager.viewmodel.EmployeeListViewModel
 import com.storeapp.storemanager.viewmodel.EmployeeListViewModelFactory
@@ -35,16 +37,23 @@ class EmployeeDetailActivity : AppCompatActivity() {
 
         title = employeeItem?.employeeName
         val application = requireNotNull(this).application
-        val viewModelFactory = EmployeeListViewModelFactory()
+        val dataSource = EmployeeDatabase.getInstance(application).employeeDatabaseDao
+        val viewModelFactory = EmployeeListViewModelFactory(dataSource)
         employeeListViewModel =
             ViewModelProvider(this, viewModelFactory).get(EmployeeListViewModel::class.java)
 
         val employeeId = employeeItem?.id ?: 0
         if (employeeId != 0) {
-            pbEmployeeDetail.visibility = View.VISIBLE
-            employeeListViewModel.getEmployee(employeeId)
+            if (NetworkConnectionUtils.isNetworkConnected(this)) {
+                pbEmployeeDetail.visibility = View.VISIBLE
+                employeeListViewModel.getEmployee(employeeId)
+                subscribeViewModel()
+            }else{
+                tvEmployeeDetailNameValue.text = employeeItem?.employeeName
+                tvEmployeeDetailSalaryValue.text = employeeItem?.employeeSalary
+                tvEmployeeDetailAgeValue.text = "${employeeItem?.employeeAge}"
+            }
         }
-        subscribeViewModel()
     }
 
     private fun subscribeViewModel() {

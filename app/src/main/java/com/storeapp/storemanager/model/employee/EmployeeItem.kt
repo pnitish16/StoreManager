@@ -2,8 +2,11 @@ package com.storeapp.storemanager.model.employee
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+@Entity(tableName = "employee_table")
 data class EmployeeItem(
 
 	@field:SerializedName("profile_image")
@@ -15,8 +18,9 @@ data class EmployeeItem(
 	@field:SerializedName("employee_salary")
 	val employeeSalary: String? = null,
 
+	@PrimaryKey
 	@field:SerializedName("id")
-	val id: Int? = 0,
+	val id: Int,
 
 	@field:SerializedName("employee_age")
 	val employeeAge: Int? = 0
@@ -25,7 +29,7 @@ data class EmployeeItem(
 		parcel.readString(),
 		parcel.readString(),
 		parcel.readString(),
-		parcel.readValue(Int::class.java.classLoader) as? Int,
+		parcel.readValue(Int::class.java.classLoader) as Int,
 		parcel.readValue(Int::class.java.classLoader) as? Int
 	) {
 	}

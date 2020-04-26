@@ -10,12 +10,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.storeapp.storemanager.NetworkConnectionUtils
 import com.storeapp.storemanager.R
 import com.storeapp.storemanager.adapter.EmployeeListAdapter
+import com.storeapp.storemanager.database.EmployeeDatabase
 import com.storeapp.storemanager.model.employee.EmployeeItem
 import com.storeapp.storemanager.viewmodel.EmployeeListViewModel
 import com.storeapp.storemanager.viewmodel.EmployeeListViewModelFactory
 import kotlinx.android.synthetic.main.activity_employee_list.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class EmployeeListActivity : AppCompatActivity(),
@@ -38,7 +43,8 @@ class EmployeeListActivity : AppCompatActivity(),
         btnEmployeeAgeSort.setOnClickListener(this)
 
         val application = requireNotNull(this).application
-        val viewModelFactory = EmployeeListViewModelFactory()
+        val dataSource = EmployeeDatabase.getInstance(application).employeeDatabaseDao
+        val viewModelFactory = EmployeeListViewModelFactory(dataSource)
         employeeListViewModel =
             ViewModelProvider(this, viewModelFactory).get(EmployeeListViewModel::class.java)
         layoutManager =
@@ -49,8 +55,24 @@ class EmployeeListActivity : AppCompatActivity(),
 
         title = "EmployeeList"
         pbEmployeeList.visibility = View.VISIBLE
-        employeeListViewModel.getEmployeeList()
-        subscribeViewModel()
+
+        if (NetworkConnectionUtils.isNetworkConnected(this)) {
+            employeeListViewModel.getEmployeeList()
+            subscribeViewModel()
+        } else {
+            pbEmployeeList.visibility = View.VISIBLE
+            employeeListViewModel.getEmployeeListFromDb()
+                .observe(this, Observer<List<EmployeeItem?>> {
+                    pbEmployeeList.visibility = View.GONE
+                    if (it.isNotEmpty())
+                        tvEmptyViewEmployeeList.visibility = View.GONE
+                    else
+                        tvEmptyViewEmployeeList.visibility = View.VISIBLE
+                    employeeList.clear()
+                    employeeList.addAll(it)
+                    employeeListAdapter.notifyDataSetChanged()
+                })
+        }
     }
 
     private fun subscribeViewModel() {
@@ -64,6 +86,10 @@ class EmployeeListActivity : AppCompatActivity(),
                 employeeList.clear()
                 employeeList.addAll(it)
                 employeeListAdapter.notifyDataSetChanged()
+
+                CoroutineScope(Dispatchers.Main).launch {
+                    employeeListViewModel.insertEmployeeDb(employeeList)
+                }
             })
 
         employeeListViewModel.mutableResponseError.observe(this,

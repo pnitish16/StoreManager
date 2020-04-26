@@ -4,8 +4,11 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.storeapp.storemanager.database.EmployeeDatabase
+import com.storeapp.storemanager.database.EmployeeDatabaseDao
 import com.storeapp.storemanager.model.BaseEntity
 import com.storeapp.storemanager.model.employee.EmployeeItem
 import com.storeapp.storemanager.network.EmployeeApi
@@ -14,45 +17,50 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import retrofit2.Response
 
-class EmployeeListViewModel() : ViewModel() {
+class EmployeeListViewModel(val database: EmployeeDatabaseDao) : ViewModel() {
 
     private var employeeDataRepository: EmployeeDataRepository = EmployeeDataRepository()
     var mutableEmployeeList = MutableLiveData<List<EmployeeItem?>>()
+    var mutableEmployeeListDb = MutableLiveData<List<EmployeeItem?>>()
     var mutableResponseError = MutableLiveData<String>()
     var mutableEmployee = MutableLiveData<EmployeeItem?>()
     private val viewModelScope = CoroutineScope(Dispatchers.Main)
     var mutableEmployeeListName = MutableLiveData<List<EmployeeItem?>>()
 
-    private val compositeDisposable = CompositeDisposable()
+    //coroutine database operations
+    private var viewModelJob = Job()
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
-  /*  fun getEmployeeListNew(){
-        val disposable = employeeApi.getEmployeeList()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                val status = it.status
-                if (status.equals("success")) {
-                    if (it.data != null) {
-                        mutableEmployeeList.value = it.data!!
-                    }
-                } else if (status == "failed") {
-                    mutableResponseError.value = it.message!!
-                }
-            },
-                { error ->
-                    run {
-                        Log.d("error", error.message ?: "Error")
-                        mutableResponseError.value = error.message ?: "Error"
-                    }
-                })
-        compositeDisposable.add(disposable)
-    }*/
+    //region Database operations
+    init {
+//        intializeEmployeeList()
+    }
+
+    fun getEmployeeListFromDb(): LiveData<List<EmployeeItem?>> {
+        return database.getAllEmployees()
+    }
+
+    suspend fun insertEmployeeDb(employeeList: List<EmployeeItem?>) {
+        withContext(Dispatchers.IO) {
+            database.insertAllEmployees(employeeList)
+        }
+    }
+
+    suspend fun deleteEmployeeDb(id: Int) {
+        withContext(Dispatchers.IO) {
+            database.deleteEmployee(id)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
+    }
+
+//endregion
 
 
     //getting all employees
@@ -138,7 +146,7 @@ class EmployeeListViewModel() : ViewModel() {
             mutableEmployeeListName.value = sortListAge(list)
         }
     }
-    //endregion
+//endregion
 
     /**
      * Sorting the list
